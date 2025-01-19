@@ -1,0 +1,165 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  overflow: hidden; /* Prevent scrolling */
+}
+
+.desktop {
+  background-image: url("https://i.ibb.co/c6C0jFC/Capture.png"); /* Background image */
+  background-size: cover; /* Scale the image to cover the entire area */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Prevent tiling of the image */
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  position: relative; /* For absolute positioning of children */
+  overflow: hidden; /* Prevent scrolling */
+}
+
+.desktop-icons {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  cursor: pointer;
+  color: white;
+  text-align: center;
+}
+
+.desktop-icon img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 5px;
+  border-radius: 10%; /* rounded image */
+}
+
+.window {
+  position: absolute;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  min-width: 300px; /* Min window width */
+  min-height: 200px; /* Min window height */
+  z-index: 1;
+}
+
+.window.minimized {
+  display: none; /* Hide the window */
+}
+
+.window-titlebar {
+  background-color: #ddd;
+  padding: 5px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.window-title {
+  font-weight: bold;
+}
+
+.window-controls {
+  display: flex;
+}
+
+.window-control-button {
+  padding: 3px 6px;
+  margin-left: 3px;
+  border: none;
+  background-color: #ccc;
+  cursor: pointer;
+}
+
+.window-content {
+  padding: 10px;
+  overflow: auto; /* scroll if overflow */
+}
+
+.taskbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #555;
+  display: flex;
+  padding: 5px;
+  align-items: center;
+}
+
+.taskbar-items {
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.taskbar-item {
+  padding: 5px;
+  margin: 3px;
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Show ... if text is too long */
+  max-width: 150px; /* limit width */
+}
+
+.start-button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  background-color: #777;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+/* ... (Existing CSS) ... */
+
+.window {
+  position: absolute;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  min-width: 300px; /* Min window width */
+  min-height: 200px; /* Min window height */
+  z-index: 1;
+}
+
+/* Resize handles */
+.window-resize {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #999;
+  z-index: 10; /* Ensure handle is on top */
+}
+.window-resize-nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+
+.window-resize-ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+
+.window-resize-sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+
+.window-resize-se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
