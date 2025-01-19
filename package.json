@@ -1,0 +1,14 @@
+{
+  "name": "simple-proxy",
+  "version": "1.0.0",
+  "description": "Simple proxy using python, html, js and css",
+  "scripts": {
+    "start": "python server.py"
+  },
+  "keywords": ["html", "css"],
+  "author": "Ives van Hoorne",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "11.2.0"
+  }
+}
