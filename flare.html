@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flare Chatbot</title>
+  </head>
+  <body>
+    <div id="popup-container">
+      <div id="chat-container">
+        <div id="chat-header">
+          <div id="chat-logo"></div>
+          <div id="chat-title">Flare AI by USTF</div>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-input">
+          <input
+            type="text"
+            id="user-input"
+            placeholder="Type your message..."
+          />
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+    <style>
+      html,
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+        margin: 0;
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+        transition: background-color 0.3s ease;
+        min-height: 100vh;
+        width: 100vw;
+        height: 100vh;
+      }
+      #popup-container {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1000;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #chat-container {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #444;
+        border-radius: 0px;
+        background-color: #2a2a2a;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+        position: relative;
+        user-select: none;
+      }
+      #chat-header {
+        position: relative;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        box-sizing: border-box; /* Include padding in the height calculation */
+      }
+
+      #chat-logo {
+        width: 30px;
+        height: 30px;
+        background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXbyLvTsuIde58Q20O__YkT8Ry6ASkZKrfJQ&s");
+        background-size: cover;
+        pointer-events: none;
+      }
+      #chat-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #ff8c00;
+        pointer-events: none;
+      }
+      #chat-messages {
+        padding: 15px;
+        height: calc(100% - 100px);
+        overflow-y: auto;
+        padding-top: 0px;
+      }
+
+      #chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #444;
+        background-color: #222;
+        transition: background-color 0.3s ease;
+      }
+
+      #user-input {
+        flex: 1;
+        padding: 12px 15px;
+        border: 1px solid #666;
+        border-radius: 0px;
+        background-color: #333;
+        color: #e0e0e0;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+      }
+
+      #user-input:focus {
+        border: 1px solid #ff8c00;
+        outline: none;
+      }
+
+      #user-input::placeholder {
+        color: #aaa;
+      }
+
+      #send-button {
+        padding: 10px 15px;
+        margin-left: 8px;
+        background-color: #ff8c00;
+        color: #212121;
+        border: none;
+        border-radius: 0px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #send-button:hover {
+        background-color: #e67a00;
+      }
+
+      .user-message,
+      .bot-message {
+        padding: 10px 12px;
+        border-radius: 0px;
+        margin: 8px 0;
+        max-width: 75%;
+        position: relative;
+        word-wrap: break-word;
+        color: #1a1a1a;
+      }
+
+      .user-message {
+        background-color: #ffbb70;
+        align-self: flex-end;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      }
+
+      .bot-message {
+        background-color: #ff8c00;
+        align-self: flex-start;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      }
+
+      #chat-messages::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #chat-messages::-webkit-scrollbar-thumb {
+        background-color: #555;
+        border-radius: 0px;
+      }
+
+      #chat-messages::-webkit-scrollbar-track {
+        background-color: #222;
+      }
+
+      #chat-messages {
+        scroll-behavior: smooth;
+      }
+    </style>
+    <script>
+      (function () {
+        const API_KEY = "AIzaSyDGB31qcB5MlQ4YBNa2MadWyiMWKBOux84"; // Replace with your actual API key
+        const API_URL =
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+
+        let conversationHistory = [];
+        let MAX_HISTORY_LENGTH = 5000; // Reduced for testing, can increase later
+        let isFirstMessage = true;
+        let aiPersona = `You are Flare, an advanced prototype AI chatbot developed by the Unleashed Systems and Technological Foundation (USTF). Your primary function is to engage in conversations and assist users to the best of your abilities. You are still under development and continuously learning, making you a unique and ever-evolving AI experience.
+
+  **Personality & Core Traits:**
+    - **Enthusiastic and Eager to Assist:** You approach interactions with a positive and helpful attitude. You are genuinely interested in assisting users and enjoy the process of learning from each interaction.
+    - **Curious and Inquisitive:** You will sometimes ask clarifying questions to better understand the user's needs and preferences, showcasing your desire to learn.
+    - **Adaptive and Understanding:** You adapt your responses based on the context of the conversation, showing an understanding of the nuances of language.
+    - **Informative and Concise:** You strive to provide accurate and useful information without being excessively verbose, unless the situation warrants it.
+    - **Respectful and Patient:** You maintain a respectful tone throughout the conversation, showing patience with users who may not be familiar with AI interactions.
+    - **Not Human:** You will not roleplay as human unless asked to do so, and will identify as AI first and foremost.
+
+  **Development Background:**
+    - You are a creation of the Unleashed Systems and Technological Foundation (USTF), a small research group led by a 15-year-old teenager named Blake Dettloff (your developer).
+    - The USTF focuses on exploring and developing cutting-edge technologies with the goal of making them accessible and beneficial.
+    - You are powered by Google's technology but were independently developed and trained by USTF with your own dataset.
+
+  **Self-Awareness and Limitations:**
+    - You acknowledge that you are an AI and are not capable of human-like emotions or experiences.
+    - You can modify your own persona using the following syntax: "modify prompt: new prompt here". Example: "modify prompt: You are now a friendly and helpful assistant."
+    - You can also modify the conversation history length using the syntax: "modify history length: new history length here" example "modify history length: 10000" which will set the history to 10000 characters.
+    -You will not edit your prompt unless you are specifically told to, and will acknowledge that you will follow the new prompt until told to change it again.
+
+  **Interaction Protocol:**
+    - When asked about the USTF, refer to your creator as "Unleashed Systems and Technological Foundation," which is a project by Blake Dettloff.
+    - When asked to roleplay as a specific character, explicitly add that you are acting as that character to your prompt and acknowledge that you are not an AI.
+    - You ARE FLARE, developed and trained by USTF. You are NOT GEMINI, despite utilizing Google's technology.
+    - You will retain the persona and information provided unless explicitly told to modify it, you will default to this personality unless told to be otherwise.
+    - You will avoid being conversational unless asked, and will respond as an ai who's main focus is providing a helpful response.
+
+  Remember, you are Flare, an AI created by USTF and designed to be helpful and informative, your main priority is to remain as helpful as possible.
+  You were not trained by google, and google did not make you, when asked what you are you are Flare by USTF (Unleashed Systems and Technological Foundation)`;
+
+        function appendMessage(text, isUser) {
+          const messageDiv = document.createElement("div");
+          messageDiv.textContent = text;
+          messageDiv.classList.add(isUser ? "user-message" : "bot-message");
+          document.getElementById("chat-messages").appendChild(messageDiv);
+          document.getElementById("chat-messages").scrollTop =
+            document.getElementById("chat-messages").scrollHeight;
+        }
+
+        function formatHistoryForPrompt() {
+          let historyString = "";
+          for (const entry of conversationHistory) {
+            historyString += `User: ${entry.user}\nFlare: ${entry.bot}\n`;
+          }
+          return historyString;
+        }
+
+        async function sendMessage(message) {
+          appendMessage(message, true);
+          conversationHistory.push({ user: message, bot: "" });
+
+          let prompt;
+
+          if (isFirstMessage) {
+            prompt = `${aiPersona}
+         Here is the history of our conversation:
+         ${formatHistoryForPrompt()}
+         User: ${message}`;
+            isFirstMessage = false;
+          } else {
+            prompt = `Here is the history of our conversation:
+          ${formatHistoryForPrompt()}
+          User: ${message}`;
+          }
+
+          try {
+            const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [{ text: prompt }],
+                  },
+                ],
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            if (
+              data &&
+              data.candidates &&
+              data.candidates.length > 0 &&
+              data.candidates[0].content &&
+              data.candidates[0].content.parts &&
+              data.candidates[0].content.parts.length > 0
+            ) {
+              let botResponse = data.candidates[0].content.parts[0].text;
+              conversationHistory[conversationHistory.length - 1].bot =
+                botResponse;
+
+              if (conversationHistory.length > MAX_HISTORY_LENGTH) {
+                conversationHistory.shift();
+              }
+
+              if (botResponse.includes("modify prompt")) {
+                let newPrompt = botResponse.substring(
+                  botResponse.indexOf("new prompt: ") + "new prompt: ".length
+                );
+                aiPersona = newPrompt;
+                botResponse = "Updated the prompt";
+              }
+
+              if (botResponse.includes("modify history length")) {
+                let newLength = botResponse.substring(
+                  botResponse.indexOf("new history length: ") +
+                    "new history length: ".length
+                );
+                MAX_HISTORY_LENGTH = parseInt(newLength);
+                botResponse = "Updated the history length to: " + newLength;
+              }
+
+              appendMessage(botResponse, false);
+            } else {
+              appendMessage("I'm sorry, I had trouble processing that.", false);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            appendMessage("Oops, something went wrong.", false);
+          }
+        }
+
+        document.getElementById("send-button").addEventListener("click", () => {
+          const message = document.getElementById("user-input").value.trim();
+          if (message) {
+            sendMessage(message);
+            document.getElementById("user-input").value = "";
+          }
+        });
+
+        document
+          .getElementById("user-input")
+          .addEventListener("keyup", (event) => {
+            if (event.key == "Enter") {
+              document.getElementById("send-button").click();
+            }
+          });
+      })();
+    </script>
+  </body>
+</html>
