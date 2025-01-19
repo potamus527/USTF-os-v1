@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wolf Hill</title>
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f7f9fb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .search-container {
+        width: 90%;
+        max-width: 800px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .search-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        text-align: center;
+      }
+
+      .search-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+      }
+
+      .search-body {
+        flex-grow: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      iframe {
+        flex-grow: 1;
+        width: 100%;
+        height: 60vh;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      /* Button styling */
+      .submit-button {
+        background-color: #ff6f00;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 1rem;
+        align-self: flex-start;
+      }
+
+      .submit-button:hover {
+        background-color: #ef8b00;
+      }
+
+      /* Scrollbar styling */
+      iframe::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      iframe::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      iframe::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+
+      iframe::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="search-container">
+      <div class="search-header">
+        <h1>Wolf Hill</h1>
+      </div>
+      <div class="search-body">
+        <p>Type a query below to search:</p>
+        <!-- Google CSE Search Box -->
+        <script
+          async
+          src="https://cse.google.com/cse.js?cx=47e14d92b25e24e18"
+        ></script>
+        <div class="gcse-search"></div>
+
+        <!-- Iframe for displaying search results -->
+        <iframe id="results-frame"></iframe>
+      </div>
+    </div>
+
+    <script>
+      const resultsFrame = document.getElementById("results-frame");
+
+      // Monitor DOM changes for Google Search results
+      const observer = new MutationObserver(() => {
+        const searchResults = document.querySelectorAll(
+          ".gsc-results .gsc-thumbnail-inside a"
+        );
+        if (searchResults && searchResults.length > 0) {
+          searchResults.forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault(); // Prevent default behavior
+              resultsFrame.src = link.href; // Load link in iframe
+            });
+          });
+        }
+      });
+
+      // Observe the body for changes (Google dynamically adds content)
+      observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+  </body>
+</html>
